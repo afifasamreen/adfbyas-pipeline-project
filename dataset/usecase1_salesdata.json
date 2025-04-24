@@ -2,7 +2,7 @@
 	"name": "usecase1_salesdata",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "linkedService1",
+			"referenceName": "lswithAzureBlobStorage",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],

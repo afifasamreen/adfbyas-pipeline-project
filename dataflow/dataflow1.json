@@ -1,0 +1,163 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "usecase1_sqldata",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "usecase1_northsdata",
+						"type": "DatasetReference"
+					},
+					"name": "sinkNR",
+					"description": "Export data to usecase1_sqldata in table sales_north"
+				},
+				{
+					"dataset": {
+						"referenceName": "usecase1_eastdata",
+						"type": "DatasetReference"
+					},
+					"name": "sinkER",
+					"description": "Export data to usecase1_sqldata of table Sales_east table"
+				},
+				{
+					"dataset": {
+						"referenceName": "usecase1_westdata",
+						"type": "DatasetReference"
+					},
+					"name": "sinkWR"
+				},
+				{
+					"dataset": {
+						"referenceName": "usecase1_southdata",
+						"type": "DatasetReference"
+					},
+					"name": "sinkSR"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1",
+					"description": "creating totalsales column with quantity * unitprices"
+				},
+				{
+					"name": "splitingbyregion"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          OrderID as integer,",
+				"          OrderDate as date,",
+				"          CustomerID as integer,",
+				"          Region as string,",
+				"          ProductID as integer,",
+				"          Quantity as integer,",
+				"          UnitPrice as double",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source1 derive(TotalSales = Quantity  *  UnitPrice) ~> derivedColumn1",
+				"derivedColumn1 split(Region=='North',",
+				"     Region=='East',",
+				"     Region=='West',",
+				"     Region=='South',",
+				"     disjoint: false) ~> splitingbyregion@(Northregion, Eastregion, Westregion, Southregion)",
+				"splitingbyregion@Northregion sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          OrderID as integer,",
+				"          OrderDate as date,",
+				"          CustomerID as integer,",
+				"          Region as string,",
+				"          ProductID as integer,",
+				"          Quantity as integer,",
+				"          UnitPrice as double,",
+				"          TotalSales as double",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     recreate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkNR",
+				"splitingbyregion@Eastregion sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          OrderID as integer,",
+				"          OrderDate as date,",
+				"          CustomerID as integer,",
+				"          Region as string,",
+				"          ProductID as integer,",
+				"          Quantity as integer,",
+				"          UnitPrice as double,",
+				"          TotalSales as double",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     recreate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkER",
+				"splitingbyregion@Westregion sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          OrderID as integer,",
+				"          OrderDate as date,",
+				"          CustomerID as integer,",
+				"          Region as string,",
+				"          ProductID as integer,",
+				"          Quantity as integer,",
+				"          UnitPrice as double,",
+				"          TotalSales as double",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     recreate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkWR",
+				"splitingbyregion@Southregion sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          OrderID as integer,",
+				"          OrderDate as date,",
+				"          CustomerID as integer,",
+				"          Region as string,",
+				"          ProductID as integer,",
+				"          Quantity as integer,",
+				"          UnitPrice as double,",
+				"          TotalSales as double",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     recreate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkSR"
+			]
+		}
+	}
+}
